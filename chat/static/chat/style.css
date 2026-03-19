@@ -1529,7 +1529,7 @@ body {
 #typing-indicator {
     display: none;
     width: 100%;
-    padding: 0 30px 8px 30px;
+    padding: 6px 30px;
     background: var(--bg-chat-area);
 }
 
