@@ -1,0 +1,53 @@
+{% extends "chat/base.html" %} {% block content %}
+<div class="auth-split">
+  <!-- LEFT: Branding -->
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="auth-brand-icon">
+        <i class="fa-solid fa-tower-broadcast"></i>
+      </div>
+      <h1>EchoRoom</h1>
+    </div>
+    <div class="auth-left-content">
+      <h2>Welcome<br />back<span>.</span></h2>
+      <p>Pick up right where you left off. Your conversations are waiting.</p>
+    </div>
+    <div class="auth-features">
+      <div class="auth-feature">
+        <div class="auth-feature-dot"></div>
+        <span>Real-time messaging</span>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-dot"></div>
+        <span>Private & group channels</span>
+      </div>
+      <div class="auth-feature">
+        <div class="auth-feature-dot"></div>
+        <span>Online presence indicators</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Form -->
+  <div class="auth-right">
+    <h2>Sign in</h2>
+    <p class="subtitle">Enter your credentials to continue</p>
+
+    <form method="POST">
+      {% csrf_token %} {% for field in form %}
+      <div class="auth-form-group">
+        <label>{{ field.label }}</label>
+        {{ field }}
+      </div>
+      {% endfor %}
+      <button type="submit" class="auth-submit-btn">Continue →</button>
+    </form>
+
+    <div class="auth-divider"><span>New to EchoRoom?</span></div>
+
+    <div class="auth-footer">
+      Don't have an account? <a href="/register/">Create one free</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

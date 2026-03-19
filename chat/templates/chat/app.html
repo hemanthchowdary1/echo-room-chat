@@ -1,0 +1,458 @@
+{% extends "chat/base.html" %} {% load static %} {% block content %}
+<div class="app-wrapper">
+  <div class="main-sidebar">
+    <div class="profile-icon">
+      <div class="avatar-circle">
+        {{ request.user.username|make_list|first|upper }}
+      </div>
+    </div>
+
+    <ul class="nav-icons">
+      <li class="active" data-tab="home" title="Home">
+        <i class="fa-solid fa-house"></i>
+      </li>
+      <li data-tab="dms" title="Direct Messages">
+        <i class="fa-solid fa-paper-plane"></i>
+      </li>
+      <li data-tab="channels" title="Channels">
+        <i class="fa-solid fa-hashtag"></i>
+      </li>
+      <li data-tab="media" title="Media">
+        <i class="fa-solid fa-photo-film"></i>
+      </li>
+      <li data-tab="notifications" title="Notifications">
+        <i class="fa-solid fa-bell"></i>
+      </li>
+    </ul>
+
+    <div
+      class="settings-icon"
+      id="settings-btn"
+      title="Settings"
+      style="cursor: pointer"
+    >
+      <i class="fa-solid fa-gear"></i>
+    </div>
+  </div>
+
+  <aside class="conversation-panel">
+    <div class="panel-header">
+      <input type="text" placeholder="Search..." class="search-bar" />
+      <div class="sort-add">
+        <b>Messages</b>
+        <button class="add-btn" title="New Chat">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-list">
+      <div data-section="channels">
+        <div class="list-label">Common Channels</div>
+        {% for channel in all_channels %}
+        <div
+          class="chat-list-item {% if channel.id == active_conversation_id %}active-chat{% endif %}"
+          onclick="window.location.href='/chat/{{ channel.id }}/'"
+        >
+          <div
+            class="avatar-circle"
+            style="background: var(--accent-main); color: white"
+          >
+            <i class="fa-solid fa-hashtag"></i>
+          </div>
+          <div class="chat-preview">
+            <h4>{{ channel.group_name }}</h4>
+            <p class="last-message">
+              {% if channel.id in user_channel_ids %} Joined {% else %} Click to
+              join {% endif %}
+            </p>
+          </div>
+        </div>
+        {% empty %}
+        <p style="font-size: 12px; color: #a1a5b7; padding: 10px 20px">
+          No channels yet. Click + to create one.
+        </p>
+        {% endfor %}
+      </div>
+
+      <div data-section="dms">
+        <div class="list-label">Direct Messages</div>
+        {% for u in all_users %}
+        <div
+          class="chat-list-item"
+          onclick="startWhatsAppChat('{{ u.username }}')"
+        >
+          <div class="avatar-circle">
+            {{ u.username|make_list|first|upper }}
+            <div
+              class="status-dot offline"
+              data-username="{{ u.username }}"
+            ></div>
+          </div>
+          <div class="chat-preview">
+            <div class="preview-header">
+              <h4>{{ u.username }}</h4>
+            </div>
+            <p class="last-message">Click to message</p>
+          </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">No users found.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </aside>
+
+  <main class="active-chat-panel">
+    {% if room_name %}
+    <header class="chat-header">
+      <div class="chat-title-info">
+        <div class="header-avatar">
+          {% if conversation.is_group %}
+          <i class="fa-solid fa-hashtag" style="font-size: 16px"></i>
+          {% else %} {{ other_user.username|make_list|first|upper|default:"?" }}
+          {% endif %}
+        </div>
+
+        <div class="header-text">
+          {% if conversation.is_group %}
+          <h3>{{ conversation.group_name }}</h3>
+          <span class="status-pill group-pill"
+            >{{ conversation.users.count }} members</span
+          >
+          {% else %}
+          <h3>{{ other_user.username|default:"Conversation" }}</h3>
+          <span
+            class="status-pill offline-pill profile-status-text"
+            data-username="{{ other_user.username }}"
+          >
+            <span class="offline-dot"></span> Offline
+          </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="header-icon-btn" title="Chat Details">
+          <i class="fa-solid fa-circle-info"></i>
+        </button>
+      </div>
+    </header>
+
+    <div id="chat-log" class="chat-messages">
+      {% for message in messages %}
+      <div
+        class="message-wrapper {% if message.sender == request.user %}sent{% else %}received{% endif %}"
+      >
+        {% if conversation.is_group and message.sender != request.user %}
+        <div
+          class="avatar-circle"
+          style="
+            width: 32px;
+            height: 32px;
+            font-size: 13px;
+            margin-right: 8px;
+            align-self: flex-end;
+          "
+        >
+          {{ message.sender.username|make_list|first|upper }}
+        </div>
+        {% endif %}
+        <div>
+          {% if conversation.is_group and message.sender != request.user %}
+          <span class="sender-name">{{ message.sender.username }}</span>
+          {% endif %}
+          <div class="message-bubble">
+            {% if message.image %}
+            <img
+              src="{{ message.image.url }}"
+              style="
+                max-width: 200px;
+                border-radius: 10px;
+                display: block;
+                margin-bottom: 4px;
+              "
+            />
+            <span style="font-size: 11px; opacity: 0.8">📎 Image</span>
+            {% else %} {{ message.content }} {% endif %}
+          </div>
+          <span class="timestamp">{{ message.timestamp|time:"H:i" }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="message-input-area">
+        <div id="typing-indicator"></div>
+      <div class="reactions-wrapper" id="emoji-menu">
+        <div class="reactions-bar">
+          <span class="emoji-click">👍</span>
+          <span class="emoji-click">❤️</span>
+          <span class="emoji-click">😂</span>
+          <span class="emoji-click">😮</span>
+          <span class="emoji-click">🙏</span>
+          <span class="emoji-click">😭</span>
+          <span class="emoji-click">👏</span>
+        </div>
+      </div>
+
+      <div class="input-wrapper">
+        <input
+          type="file"
+          id="image-input"
+          accept="image/*"
+          style="display: none"
+        />
+        <span id="attach-btn" title="Attach Image"
+          ><i class="fa-solid fa-paperclip"></i
+        ></span>
+
+        <input
+          id="chat-message-input"
+          type="text"
+          placeholder="Type a message here..."
+        />
+
+        <span
+          id="emoji-toggle-btn"
+          style="color: var(--accent-main); cursor: pointer"
+          ><i class="fa-solid fa-face-smile"></i
+        ></span>
+
+        <button id="chat-message-submit" class="send-btn">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+    {% else %}
+    <div class="empty-chat-state">
+      <h2>Select a conversation to start chatting</h2>
+    </div>
+    {% endif %}
+  </main>
+
+  <aside class="profile-details-panel" style="position: relative">
+    {% if conversation and conversation.is_group %}
+    <div class="profile-banner"></div>
+    <div class="close-profile">✕</div>
+    <div class="profile-info-large">
+      <div class="avatar-large"><i class="fa-solid fa-hashtag"></i></div>
+      <h3># {{ conversation.group_name }}</h3>
+      <p class="location">{{ conversation.users.count }} members</p>
+      <p class="bio">A common channel in EchoRoom.</p>
+    </div>
+    <div class="contact-info">
+      <p><span>Channel ID</span> <span>#{{ conversation.id }}</span></p>
+      <p>
+        <span>Created</span>
+        <span>{{ conversation.created_at|date:"M d, Y" }}</span>
+      </p>
+    </div>
+    <div class="media-gallery">
+      <div class="media-header"><h4>Members</h4></div>
+      {% for member in conversation.users.all %}
+      <div class="member-row">
+        <div
+          class="avatar-circle"
+          style="width: 34px; height: 34px; font-size: 13px; flex-shrink: 0"
+        >
+          {{ member.username|make_list|first|upper }}
+        </div>
+        <span>{{ member.username }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% elif other_user %}
+    <div class="profile-banner"></div>
+    <div class="close-profile">✕</div>
+    <div class="profile-info-large">
+      <div class="avatar-large">
+        {{ other_user.username|make_list|first|upper }}
+      </div>
+      <h3 id="profile-username" data-username="{{ other_user.username }}">
+        {{ other_user.username }}
+      </h3>
+      <p
+        class="status-pill offline-pill profile-status-text"
+        data-username="{{ other_user.username }}"
+        style="margin-bottom: 8px"
+      >
+        <span class="offline-dot"></span> Offline
+      </p>
+      <p class="bio">Joined EchoRoom recently. Ready to chat!</p>
+      <div class="social-links">
+        <span class="social-icon fb">f</span>
+        <span class="social-icon tw">t</span>
+        <span class="social-icon ig">ig</span>
+      </div>
+    </div>
+    <div class="contact-info">
+      <p><span>Member ID</span> <span>#{{ other_user.id }}</span></p>
+      <p>
+        <span>Joined</span>
+        <span>{{ other_user.date_joined|date:"M d, Y" }}</span>
+      </p>
+    </div>
+    <div class="media-gallery">
+      <div class="media-header">
+        <h4>Media ({{ media_count|default:"0" }})</h4>
+        {% if media_count > 0 %}<a href="#">See all ></a>{% endif %}
+      </div>
+      <div class="media-thumbnails">
+        {% for media in recent_media %}
+        <a href="{{ media.image.url }}" target="_blank">
+          <div
+            class="media-thumb"
+            style="background-image: url('{{ media.image.url }}');"
+            title="Sent by {{ media.sender.username }}"
+          ></div>
+        </a>
+        {% empty %}
+        <p
+          style="
+            font-size: 12px;
+            color: #a1a5b7;
+            grid-column: span 3;
+            text-align: center;
+            margin-top: 8px;
+          "
+        >
+          No media yet. Click 📎 to upload!
+        </p>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% else %}
+    <div class="empty-profile-state">
+      <p>Select a chat to view details.</p>
+    </div>
+    {% endif %}
+  </aside>
+  <div class="settings-panel" id="settings-panel">
+    <div class="settings-banner">
+      <span class="settings-close" id="settings-close">✕</span>
+    </div>
+    <div class="settings-avatar">
+      {{ request.user.username|make_list|first|upper }}
+    </div>
+    <div class="settings-info">
+      <h3>{{ request.user.username }}</h3>
+      <p>EchoRoom Member</p>
+    </div>
+    <div class="settings-fields">
+      <div class="settings-field">
+        <label>Member ID</label>
+        <span>#{{ request.user.id }}</span>
+      </div>
+      <div class="settings-field">
+        <label>Username</label>
+        <span>{{ request.user.username }}</span>
+      </div>
+      <div class="settings-field">
+        <label>Member Since</label>
+        <span>{{ request.user.date_joined|date:"M d, Y" }}</span>
+      </div>
+    </div>
+    <a href="/logout/" class="logout-btn">
+      <i class="fa-solid fa-right-from-bracket"></i> Log Out
+    </a>
+  </div>
+</div>
+
+{% if room_name %}
+<script>
+  window.currentRoomName = "{{ room_name }}";
+  window.currentRoomIsGroup =
+    "{% if conversation and conversation.is_group %}true{% else %}false{% endif %}" ===
+    "true";
+</script>
+{% endif %}
+
+<div id="new-chat-modal" class="modal-overlay" style="display: none">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Start a New Chat</h3>
+      <span class="close-modal">✕</span>
+    </div>
+
+    <div class="modal-body">
+      <div class="chat-type-toggle">
+        <button id="btn-channel" class="toggle-btn active">Channel</button>
+        <button id="btn-private" class="toggle-btn">Private Message</button>
+      </div>
+
+      <div id="form-private" class="modal-form" style="display: none">
+        <label>Select a user to message:</label>
+        <div class="contact-list" style="max-height: 200px; overflow-y: auto">
+          {% for u in all_users %}
+          <div
+            class="chat-list-item"
+            data-username="{{ u.username }}"
+            onclick="
+              document
+                .querySelectorAll('#form-private .chat-list-item')
+                .forEach((i) => i.classList.remove('selected'));
+              this.classList.add('selected');
+            "
+            style="margin-bottom: 5px; background: #f8f9fb; cursor: pointer"
+          >
+            <div class="avatar-circle">
+              {{ u.username|make_list|first|upper }}
+            </div>
+            <div class="chat-preview">
+              <h4>{{ u.username }}</h4>
+            </div>
+          </div>
+          {% empty %}
+          <p style="font-size: 12px; color: #a1a5b7">
+            No other users registered yet.
+          </p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div id="form-channel" class="modal-form">
+        <label>Existing Channels:</label>
+        <div
+          class="contact-list"
+          style="max-height: 160px; overflow-y: auto; margin-bottom: 15px"
+        >
+          {% for channel in all_channels %}
+          <div
+            class="chat-list-item"
+            onclick="window.location.href='/chat/{{ channel.id }}/'; document.querySelector('#new-chat-modal').style.display='none';"
+            style="margin-bottom: 5px; background: #f8f9fb; cursor: pointer"
+          >
+            <div
+              class="avatar-circle"
+              style="background: var(--accent-main); color: white"
+            >
+              <i class="fa-solid fa-hashtag"></i>
+            </div>
+            <div class="chat-preview">
+              <h4>{{ channel.group_name }}</h4>
+              <p style="font-size: 11px; color: #a1a5b7">
+                {% if channel.id in user_channel_ids %}Joined{% else %}Click to
+                join{% endif %}
+              </p>
+            </div>
+          </div>
+          {% empty %}
+          <p style="font-size: 12px; color: #a1a5b7; padding: 10px 0">
+            No channels yet.
+          </p>
+          {% endfor %}
+        </div>
+
+        <label>Create New Channel:</label>
+        <input type="text" id="channel-name" placeholder="e.g. #general" />
+      </div>
+
+      <button id="submit-new-chat" class="submit-btn">Start Chat</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
