@@ -1,4 +1,4 @@
-// --- Global Notification Socket for Online/Offline Status ---
+// Global Notification Socket for Online/Offline Status
 const notificationSocket = new WebSocket(
   "ws://" + window.location.host + "/ws/notifications/",
 );
@@ -48,7 +48,7 @@ function updateUserStatus(username, status) {
     }
   });
 }
-// --- End Global Notification Socket ---
+// End Global Notification Socket
 
 // Only connect to WebSocket if a room is actually selected
 if (window.currentRoomName) {
@@ -86,7 +86,7 @@ if (window.currentRoomName) {
         </div>
       `;
 
-      // Wait 100ms for the HTML to render, then pull the specific element into view smoothly.
+      // Wait 100ms for the HTML to render, then pull the specific element into view smoothly
       setTimeout(() => {
         if (typingIndicator) {
           typingIndicator.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -206,7 +206,7 @@ if (window.currentRoomName) {
     }
   });
 
-  // --- Image Upload Logic ---
+  // Image Upload Logic
   const attachBtn = document.querySelector("#attach-btn");
   const imageInput = document.querySelector("#image-input");
 
@@ -262,7 +262,7 @@ if (window.currentRoomName) {
   }
 }
 
-// --- Chat Modal Logic ---
+// Chat Modal Logic
 const addBtn = document.querySelector(".add-btn");
 const modal = document.querySelector("#new-chat-modal");
 const closeModal = document.querySelector(".close-modal");
@@ -326,7 +326,7 @@ submitNewChat.onclick = () => {
     .then((response) => response.json())
     .then((data) => {
       if (data.status === "success") {
-        // Redirect to the newly created chat!
+        // Redirect to the newly created chat
         window.location.href = "/chat/" + data.room_id + "/";
       } else {
         alert(data.message);
@@ -334,7 +334,7 @@ submitNewChat.onclick = () => {
     });
 };
 
-// --- Search Bar Filtering ---
+// Search Bar Filtering
 const searchBar = document.querySelector(".search-bar");
 
 if (searchBar) {
@@ -359,7 +359,7 @@ if (searchBar) {
   });
 }
 
-// --- Direct Message Trigger ---
+// Direct Message Trigger
 function startWhatsAppChat(targetUsername) {
   const csrftoken = document.cookie
     .split("; ")
@@ -378,7 +378,7 @@ function startWhatsAppChat(targetUsername) {
     });
 }
 
-// --- Sidebar Tab Switching ---
+// Sidebar Tab Switching
 const navItems = document.querySelectorAll(".nav-icons li[data-tab]");
 const channelsSection = document.querySelector('[data-section="channels"]');
 const dmsSection = document.querySelector('[data-section="dms"]');
@@ -412,7 +412,7 @@ navItems.forEach((tab) => {
   });
 });
 
-// --- Settings Panel ---
+// Settings Panel
 const settingsBtn = document.querySelector("#settings-btn");
 const settingsPanel = document.querySelector("#settings-panel");
 const settingsClose = document.querySelector("#settings-close");
@@ -429,7 +429,7 @@ if (settingsClose && settingsPanel) {
   });
 }
 
-// --- Interactive Emoji Menu ---
+// Interactive Emoji Menu
 const emojiToggleBtn = document.querySelector("#emoji-toggle-btn");
 const emojiMenu = document.querySelector("#emoji-menu");
 const chatInputBox = document.querySelector("#chat-message-input");

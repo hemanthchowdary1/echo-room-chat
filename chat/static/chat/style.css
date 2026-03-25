@@ -55,7 +55,7 @@ body {
   min-width: 320px;
 }
 
-/* --- COLUMN 1: Dark Sidebar --- */
+/* COLUMN 1: Dark Sidebar */
 .main-sidebar {
   width: 80px;
   background: var(--bg-sidebar);
@@ -132,7 +132,7 @@ body {
   transform: rotate(90deg);
 }
 
-/* --- COLUMN 2: Conversation List --- */
+/* COLUMN 2: Conversation List */
 .conversation-panel {
   width: 340px;
   background: var(--bg-chat-list);
@@ -219,7 +219,7 @@ body {
   letter-spacing: 0.8px;
 }
 
-/* --- Cards --- */
+/* Cards */
 .chat-list-item {
   display: flex;
   align-items: center;
@@ -334,7 +334,7 @@ body {
   max-width: 180px;
 }
 
-/* --- COLUMN 3: Active Chat Window --- */
+/* COLUMN 3: Active Chat Window */
 .active-chat-panel {
   flex: 1;
   display: flex;
@@ -343,7 +343,7 @@ body {
   transition: background 0.3s ease;
 }
 
-/* --- Chat Header --- */
+/* Chat Header */
 .chat-header {
   padding: 16px 30px;
   border-bottom: 1px solid var(--border-soft);
@@ -463,7 +463,7 @@ body {
   box-shadow: 0 4px 12px rgba(50, 196, 158, 0.2);
 }
 
-/* --- Chat Area Depth & Contrast --- */
+/* Chat Area Depth & Contrast */
 .chat-messages {
   flex: 1;
   padding: 30px;
@@ -472,7 +472,7 @@ body {
   transition: background 0.3s ease;
 }
 
-/* --- Message Bubbles --- */
+/* Message Bubbles */
 .message-wrapper {
   display: flex;
   margin-bottom: 20px;
@@ -547,7 +547,7 @@ body {
   padding-left: 4px;
 }
 
-/* --- Sleek Pill Input Area --- */
+/* Sleek Pill Input Area */
 .message-input-area {
   padding: 16px 30px;
   background: var(--bg-panel);
@@ -878,7 +878,7 @@ body {
   color: var(--text-muted);
 }
 
-/* --- Modal Styles --- */
+/* Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1077,7 +1077,7 @@ body {
   padding-left: 4px;
 }
 
-/* --- SETTINGS PANEL --- */
+/* SETTINGS PANEL */
 .settings-panel {
   width: 320px;
   background: var(--bg-panel);
@@ -1243,7 +1243,7 @@ body {
   transform: translateY(-2px);
 }
 
-/* --- Sleek Floating Emoji Popover --- */
+/* Sleek Floating Emoji Popover */
 .reactions-wrapper {
   display: none;
   position: absolute;
@@ -1284,7 +1284,7 @@ body {
   transform: scale(1.4) translateY(-4px);
 }
 
-/* --- SPLIT SCREEN AUTH --- */
+/* SPLIT SCREEN AUTH */
 .auth-split {
   display: flex;
   width: 100vw;
@@ -1525,7 +1525,7 @@ body {
   text-decoration: underline;
 }
 
-/* --- TYPING INDICATOR --- */
+/* TYPING INDICATOR */
 #typing-indicator {
     display: none;
     width: 100%;
@@ -1617,7 +1617,7 @@ body {
   display: none;
 }
 
-/* --- RESPONSIVE --- */
+/* RESPONSIVE */
 @media (max-width: 1100px) {
   .profile-details-panel {
     display: none;

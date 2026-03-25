@@ -66,7 +66,7 @@ class ChatConsumer(WebsocketConsumer):
 
         sender = self.scope["user"]
 
-        # ✅ HANDLE TYPING START
+        # HANDLE TYPING START
         if typing is True:
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -78,7 +78,7 @@ class ChatConsumer(WebsocketConsumer):
             )
             return
         
-        # ✅ HANDLE TYPING STOP
+        # HANDLE TYPING STOP
         if typing is False:
             async_to_sync(self.channel_layer.group_send)(
                 self.room_group_name,
@@ -88,7 +88,7 @@ class ChatConsumer(WebsocketConsumer):
             )
             return
         
-        # ✅ NORMAL MESSAGE
+        # NORMAL MESSAGE
         if message:
             if not data.get("image_url"):
                 Message.objects.create(
@@ -127,8 +127,6 @@ class ChatConsumer(WebsocketConsumer):
 
     def user_list(self, event):
         self.send(text_data=json.dumps({"users": event["users"]}))
-
-# Add this below your existing ChatConsumer in consumers.py
 
 global_online_users = set()
 
