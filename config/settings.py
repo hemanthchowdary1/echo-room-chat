@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ["*"]
-
+CSRF_TRUSTED_ORIGINS = ["https://echo-room-gdj5.onrender.com"]
 
 # Application definition
 
@@ -128,3 +128,6 @@ LOGIN_URL = "/login/"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+SUPERUSER_USERNAME = os.environ.get('SUPERUSER_USERNAME')
+SUPERUSER_PASSWORD = os.environ.get('SUPERUSER_PASSWORD')
