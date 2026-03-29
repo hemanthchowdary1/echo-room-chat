@@ -1,6 +1,6 @@
 // Global Notification Socket for Online/Offline Status
 const notificationSocket = new WebSocket(
-  "ws://" + window.location.host + "/ws/notifications/",
+    (window.location.protocol === "https:" ? "wss://" : "ws://") + window.location.host + "/ws/notifications/",
 );
 
 notificationSocket.onmessage = function (e) {
@@ -54,8 +54,8 @@ function updateUserStatus(username, status) {
 if (window.currentRoomName) {
   const roomName = window.currentRoomName;
   const chatSocket = new WebSocket(
-    "ws://" + window.location.host + "/ws/chat/" + roomName + "/",
-  );
+    (window.location.protocol === "https:" ? "wss://" : "ws://") + window.location.host + "/ws/chat/" + roomName + "/",
+);
 
   const typingIndicator = document.querySelector("#typing-indicator");
   const chatLog = document.querySelector("#chat-log");
