@@ -1,5 +1,6 @@
 {% extends "chat/base.html" %} {% load static %} {% block content %}
 <div class="app-wrapper">
+<div class="app-wrapper {% if room_name %}in-chat{% else %}in-list{% endif %}">
   <div class="main-sidebar">
     <div class="profile-icon">
       <div class="avatar-circle">
@@ -107,6 +108,9 @@
     {% if room_name %}
     <header class="chat-header">
       <div class="chat-title-info">
+        <button class="mobile-back-btn" onclick="window.location.href='/'">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
         <div class="header-avatar">
           {% if conversation.is_group %}
           <i class="fa-solid fa-hashtag" style="font-size: 16px"></i>
