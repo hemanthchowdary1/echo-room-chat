@@ -1634,35 +1634,41 @@ body {
 }
 
 @media (max-width: 768px) {
-  /* 1. App takes up full mobile screen */
-  .app-wrapper { width: 100vw; height: 100vh; border-radius: 0; min-width: 0; }
+  /* App takes up full screen */
+  .app-wrapper { width: 100vw; height: 100dvh; border-radius: 0; min-width: 0; }
   body { align-items: flex-start; }
 
-  /* 2. Show/Hide Logic based on Django State */
-  /* If user is looking at the Chat List (No active chat) */
+  /* Show/Hide Logic based on Django State */
   .app-wrapper.in-list .active-chat-panel { display: none; }
   .app-wrapper.in-list .conversation-panel { display: flex; width: calc(100vw - 65px); }
-  .app-wrapper.in-list .main-sidebar { width: 65px; padding: 15px 0;}
   
-  /* If user is inside an Active Chat */
+  .app-wrapper.in-list .main-sidebar { 
+      width: 65px; 
+      padding: 15px 0 calc(25px + env(safe-area-inset-bottom)) 0; 
+  }
+  
   .app-wrapper.in-chat .main-sidebar { display: none; }
   .app-wrapper.in-chat .conversation-panel { display: none; }
   .app-wrapper.in-chat .active-chat-panel { display: flex; width: 100vw; }
   
-  /* 3. Reveal the back button */
   .mobile-back-btn { display: block; }
   
-  /* 4. Modals for Mobile */
   .modal-content { width: 90vw; }
   .settings-panel { width: 100vw; }
   
-  /* 5. Login/Register Pages for Mobile */
-  .auth-left { display: none; /* Hide branding banner on small phones */ }
+  /* Login/Register Pages for Mobile */
+  .auth-left { display: none; }
   .auth-right { width: 100vw; padding: 40px 30px; }
   
   /* Adjust chat bubbles for smaller screens */
   .message-bubble { max-width: 85%; font-size: 14px; }
   .message-wrapper > div { max-width: 85%; }
-  .message-input-area { padding: 12px 15px; }
   .chat-header { padding: 12px 15px; }
+
+  .message-input-area { 
+      padding: 12px 15px calc(16px + env(safe-area-inset-bottom)) 15px; 
+  }
+  .chat-list {
+      padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  }
 }
