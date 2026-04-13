@@ -1,0 +1,37 @@
+{% extends "chat/base.html" %}
+{% block content %}
+<div class="auth-split">
+    <div class="auth-left">
+        <div class="auth-brand">
+            <div class="auth-brand-icon">E</div>
+            <h1>EchoRoom</h1>
+        </div>
+        <div class="auth-left-content">
+            <h2>Check your<br>email<span>.</span></h2>
+            <p>We sent a 6-digit code to {{ email }}. Enter it below to verify your account.</p>
+        </div>
+    </div>
+
+    <div class="auth-right">
+        <h2>Verify OTP</h2>
+        <p class="subtitle">Enter the 6-digit code sent to {{ email }}</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="auth-form-group">
+                <label>OTP Code</label>
+                <input type="text" name="otp" placeholder="000000" maxlength="6"
+                    style="letter-spacing: 8px; font-size: 22px; text-align: center;" required autofocus />
+            </div>
+            {% if error %}
+            <p style="color:#e05c5c; font-size:13px; margin-bottom:10px;">{{ error }}</p>
+            {% endif %}
+            <button type="submit" class="auth-submit-btn">Verify →</button>
+        </form>
+
+        <div class="auth-footer">
+            Wrong email? <a href="/register/">Sign up again</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

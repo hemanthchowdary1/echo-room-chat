@@ -36,7 +36,17 @@
     <p class="subtitle">Fill in the details below to get started</p>
 
     <form method="POST">
-      {% csrf_token %} {% for field in form %}
+      {% csrf_token %}
+      <div class="auth-form-group">
+        <label>Email</label>
+        <input
+          type="email"
+          name="email"
+          placeholder="you@example.com"
+          required
+        />
+      </div>
+      {% for field in form %}
       <div class="auth-form-group">
         <label>{{ field.label }}</label>
         {{ field }} {% if field.errors %}
@@ -45,7 +55,11 @@
         </p>
         {% endif %}
       </div>
-      {% endfor %}
+      {% endfor %} {% if error %}
+      <p style="color: #e05c5c; font-size: 13px; margin-bottom: 10px">
+        {{ error }}
+      </p>
+      {% endif %}
       <button type="submit" class="auth-submit-btn">Create Account →</button>
     </form>
 

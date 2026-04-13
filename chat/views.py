@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Message, Conversation
+from .models import Message, Conversation, OTPVerification
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -52,12 +52,84 @@ def room(request, room_name):
     })
 
 def register_view(request):
-    form = UserCreationForm(request.POST or None)
-    if form.is_valid():
-        user = form.save()
-        login(request, user)
-        return redirect("/")
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            email = request.POST.get("email", "").strip()
+            if not email:
+                return render(request, "chat/register.html", {
+                    "form": form, "error": "Email is required."
+                })
+            if User.objects.filter(email=email).exists():
+                return render(request, "chat/register.html", {
+                    "form": form, "error": "This email is already registered."
+                })
+
+            user = form.save(commit=False)
+            user.email = email
+            user.is_active = False
+            user.save()
+
+            otp_obj, _ = OTPVerification.objects.get_or_create(user=user)
+            otp = otp_obj.generate_otp()
+
+            try:
+                import resend
+                from decouple import config
+                resend.api_key = config('RESEND_API_KEY')
+                resend.Emails.send({
+                    "from": "onboarding@resend.dev",
+                    "to": [email],
+                    "subject": "OTP Verification — EchoRoom",
+                    "text": f"Your OTP code is: {otp}\n\nThis code expires in 10 minutes.",
+                })
+            except Exception as e:
+                user.delete()
+                return render(request, "chat/register.html", {
+                    "form": form, "error": "Could not send OTP. Please try again."
+                })
+
+            request.session["otp_user_id"] = user.id
+            return redirect("/verify-otp/")
+    else:
+        form = UserCreationForm()
+
     return render(request, "chat/register.html", {"form": form})
+
+
+def verify_otp_view(request):
+    user_id = request.session.get("otp_user_id")
+    if not user_id:
+        return redirect("/register/")
+
+    user = get_object_or_404(User, id=user_id)
+    otp_obj = get_object_or_404(OTPVerification, user=user)
+
+    if request.method == "POST":
+        if otp_obj.is_locked_out():
+            user.delete()
+            return render(request, "chat/verify_otp.html", {
+                "email": user.email,
+                "error": "Too many failed attempts. Please sign up again."
+            })
+
+        entered_otp = request.POST.get("otp")
+        if otp_obj.verify_otp(entered_otp):
+            user.is_active = True
+            user.save()
+            login(request, user)
+            del request.session["otp_user_id"]
+            return redirect("/")
+        else:
+            attempts_left = 5 - otp_obj.failed_attempts
+            error = "Invalid or expired OTP."
+            if attempts_left <= 2:
+                error += f" ({attempts_left} attempt{'s' if attempts_left != 1 else ''} left)"
+            return render(request, "chat/verify_otp.html", {
+                "email": user.email, "error": error
+            })
+
+    return render(request, "chat/verify_otp.html", {"email": user.email})
 
 def login_view(request):
     form = AuthenticationForm(request, data=request.POST or None)
