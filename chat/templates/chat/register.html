@@ -36,17 +36,18 @@
     <p class="subtitle">Fill in the details below to get started</p>
 
     <form method="POST">
-      {% csrf_token %} {% for field in form %}
+      {% csrf_token %}
+
       <div class="auth-form-group">
-        <label>{{ field.label }}</label>
-        {{ field }} {% if field.errors %}
+        <label>{{ form.username.label }}</label>
+        {{ form.username }} 
+        {% if form.username.errors %}
         <p style="color: #e05c5c; font-size: 11px; margin-top: 4px">
-          {{ field.errors|join:", " }}
+          {{ form.username.errors|join:", " }}
         </p>
         {% endif %}
       </div>
 
-      {% if field.name == "username" %}
       <div class="auth-form-group">
         <label>Email</label>
         <input
@@ -56,16 +57,22 @@
           required
         />
       </div>
-      {% endif %} {% endfor %}
-      <div class="auth-form-group">
-        <label>{{ field.label }}</label>
-        {{ field }} {% if field.errors %}
-        <p style="color: #e05c5c; font-size: 11px; margin-top: 4px">
-          {{ field.errors|join:", " }}
-        </p>
+
+      {% for field in form %}
+        {% if field.name != 'username' %}
+        <div class="auth-form-group">
+          <label>{{ field.label }}</label>
+          {{ field }} 
+          {% if field.errors %}
+          <p style="color: #e05c5c; font-size: 11px; margin-top: 4px">
+            {{ field.errors|join:", " }}
+          </p>
+          {% endif %}
+        </div>
         {% endif %}
-      </div>
-      {% endfor %} {% if error %}
+      {% endfor %} 
+      
+      {% if error %}
       <p style="color: #e05c5c; font-size: 13px; margin-bottom: 10px">
         {{ error }}
       </p>
