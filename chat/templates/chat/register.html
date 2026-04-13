@@ -36,7 +36,17 @@
     <p class="subtitle">Fill in the details below to get started</p>
 
     <form method="POST">
-      {% csrf_token %}
+      {% csrf_token %} {% for field in form %}
+      <div class="auth-form-group">
+        <label>{{ field.label }}</label>
+        {{ field }} {% if field.errors %}
+        <p style="color: #e05c5c; font-size: 11px; margin-top: 4px">
+          {{ field.errors|join:", " }}
+        </p>
+        {% endif %}
+      </div>
+
+      {% if field.name == "username" %}
       <div class="auth-form-group">
         <label>Email</label>
         <input
@@ -46,7 +56,7 @@
           required
         />
       </div>
-      {% for field in form %}
+      {% endif %} {% endfor %}
       <div class="auth-form-group">
         <label>{{ field.label }}</label>
         {{ field }} {% if field.errors %}
