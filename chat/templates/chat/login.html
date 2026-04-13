@@ -34,12 +34,41 @@
     <p class="subtitle">Enter your credentials to continue</p>
 
     <form method="POST">
-      {% csrf_token %} {% for field in form %}
+      {% csrf_token %} {% if form.non_field_errors %}
+      <div
+        style="
+          background: rgba(224, 92, 92, 0.1);
+          padding: 12px;
+          border-radius: 12px;
+          margin-bottom: 20px;
+          border: 1px solid rgba(224, 92, 92, 0.2);
+        "
+      >
+        {% for error in form.non_field_errors %}
+        <p
+          style="
+            color: #e05c5c;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            margin: 0;
+          "
+        >
+          {{ error }}
+        </p>
+        {% endfor %}
+      </div>
+      {% endif %} {% for field in form %}
       <div class="auth-form-group">
         <label>{{ field.label }}</label>
-        {{ field }}
+        {{ field }} {% if field.errors %}
+        <p style="color: #e05c5c; font-size: 11px; margin-top: 4px">
+          {{ field.errors|join:", " }}
+        </p>
+        {% endif %}
       </div>
       {% endfor %}
+
       <button type="submit" class="auth-submit-btn">Continue →</button>
     </form>
 

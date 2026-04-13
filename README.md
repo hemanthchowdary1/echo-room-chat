@@ -10,6 +10,7 @@ A modern real-time chat application built using **Django Channels and WebSockets
 - WebSocket-based communication
 - User authentication (login/register)
 - Private chats and group channels
+- Email OTP verification (Resend API)
 - Online/offline user status
 - Typing indicators
 - Image sharing with media gallery
